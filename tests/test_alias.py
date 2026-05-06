@@ -73,3 +73,11 @@ def test_list_aliases_returns_all(tmp_vault_dir):
     assert len(aliases) == 2
     assert aliases["a"] == "alpha"
     assert aliases["b"] == "beta"
+
+
+def test_set_alias_whitespace_stripped(tmp_vault_dir):
+    """Alias and project names with surrounding whitespace should be stored stripped."""
+    set_alias("  myapp  ", "  my-application  ", vault_dir=tmp_vault_dir)
+    aliases = list_aliases(vault_dir=tmp_vault_dir)
+    assert "myapp" in aliases
+    assert aliases["myapp"] == "my-application"
