@@ -35,6 +35,8 @@ def read_vault(project_name: str) -> str:
     if not path.exists():
         raise FileNotFoundError(f"No vault found for project '{project_name}'")
     payload = json.loads(path.read_text(encoding="utf-8"))
+    if "data" not in payload:
+        raise ValueError(f"Vault file for project '{project_name}' is malformed: missing 'data' field")
     return payload["data"]
 
 
@@ -51,3 +53,21 @@ def list_vaults() -> list[str]:
     if not VAULT_DIR.exists():
         return []
     return [p.stem for p in VAULT_DIR.glob("*.vault")]
+
+
+def rename_vault(old_name: str, new_name: str) -> None:
+    """Rename a vault by moving its file and updating the stored project name.
+
+    Raises FileNotFoundError if the source vault doesn't exist, and
+    FileExistsError if a vault for new_name already exists.
+    """
+    old_path = _vault_path(old_name)
+    new_path = _vault_path(new_name)
+    if not old_path.exists():
+        raise FileNotFoundError(f"No vault found for project '{old_name}'")
+    if new_path.exists():
+        raise FileExistsError(f"A vault for project '{new_name}' already exists")
+    payload = json.loads(old_path.read_text(encoding="utf-8"))
+    payload["project"] = new_name
+    new_path.write_text(json.dumps(payload), encoding="utf-8")
+    old_path.unlink()
