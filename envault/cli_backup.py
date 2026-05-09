@@ -26,6 +26,9 @@ def cmd_backup_restore(args) -> None:
     vault_dir = _vault_dir(args)
     backup_path = Path(args.backup_file)
     overwrite = getattr(args, "overwrite", False)
+    if not backup_path.exists():
+        print(f"Error: backup file not found: {backup_path}", file=sys.stderr)
+        sys.exit(1)
     try:
         restored = restore_backup(vault_dir, backup_path, overwrite=overwrite)
         if restored:
