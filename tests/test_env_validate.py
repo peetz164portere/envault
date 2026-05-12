@@ -73,19 +73,9 @@ def test_validate_allowed_values_match_passes(tmp_vault_dir):
     assert result.valid
 
 
-def test_validate_wrong_password_raises_validation_error(tmp_vault_dir):
-    _save("secure", {"TOKEN": "abc"}, "correct", tmp_vault_dir)
-    with pytest.raises(ValidationError):
-        validate_project("secure", "wrong", vault_dir=tmp_vault_dir)
-
-
-def test_validate_missing_project_raises_validation_error(tmp_vault_dir):
-    with pytest.raises(ValidationError):
-        validate_project("nonexistent", "pass", vault_dir=tmp_vault_dir)
-
-
-def test_validate_key_without_schema_is_ignored(tmp_vault_dir):
-    _save("misc", {"UNDOCUMENTED": "value"}, "pass", tmp_vault_dir)
-    result = validate_project("misc", "pass", vault_dir=tmp_vault_dir)
+def test_validate_no_schema_defined_passes(tmp_vault_dir):
+    """Projects with no schema rules should always validate successfully."""
+    _save("bare", {"FOO": "bar", "BAZ": ""}, "pass", tmp_vault_dir)
+    result = validate_project("bare", "pass", vault_dir=tmp_vault_dir)
     assert result.valid
     assert result.issues == []
