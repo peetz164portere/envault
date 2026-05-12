@@ -29,6 +29,9 @@ def cmd_backup_restore(args) -> None:
     if not backup_path.exists():
         print(f"Error: backup file not found: {backup_path}", file=sys.stderr)
         sys.exit(1)
+    if not backup_path.suffix == ".zip":
+        print(f"Error: backup file must be a .zip archive: {backup_path}", file=sys.stderr)
+        sys.exit(1)
     try:
         restored = restore_backup(vault_dir, backup_path, overwrite=overwrite)
         if restored:
