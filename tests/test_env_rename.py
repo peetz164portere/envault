@@ -60,6 +60,13 @@ def test_rename_key_identical_names_raises(tmp_vault_dir):
         rename_key("proj", "A", "A", "pass")
 
 
+def test_rename_key_wrong_password_raises(tmp_vault_dir):
+    """Ensure a bad password surfaces an error rather than silently succeeding."""
+    _save("proj", {"KEY": "value"})
+    with pytest.raises(Exception):
+        rename_key("proj", "KEY", "NEW_KEY", "wrongpass")
+
+
 # --- rename_project ---
 
 def test_rename_project_creates_new_and_removes_old(tmp_vault_dir):
@@ -81,6 +88,14 @@ def test_rename_project_with_new_password(tmp_vault_dir):
     rename_project("alpha", "beta", "pass", new_password="newpass")
     env = load_env("beta", "newpass")
     assert env["K"] == "v"
+
+
+def test_rename_project_with_new_password_old_password_invalid(tmp_vault_dir):
+    """After re-encrypting with a new password, the old password should no longer work."""
+    _save("alpha", {"K": "v"})
+    rename_project("alpha", "beta", "pass", new_password="newpass")
+    with pytest.raises(Exception):
+        load_env("beta", "pass")
 
 
 def test_rename_project_missing_raises(tmp_vault_dir):
