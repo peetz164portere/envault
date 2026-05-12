@@ -62,3 +62,13 @@ def test_write_vault_overwrites_existing():
     write_vault("dup", "first")
     write_vault("dup", "second")
     assert read_vault("dup") == "second"
+
+
+def test_list_vaults_does_not_include_deleted():
+    """Ensure deleted vaults no longer appear in list_vaults output."""
+    write_vault("keep", "data1")
+    write_vault("remove", "data2")
+    delete_vault("remove")
+    names = list_vaults()
+    assert "keep" in names
+    assert "remove" not in names
