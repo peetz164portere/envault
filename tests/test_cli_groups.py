@@ -72,6 +72,13 @@ def test_cmd_group_add_project_prints_confirmation(tmp_vault_dir, capsys):
     assert "team" in out
 
 
+def test_cmd_group_add_project_missing_group_exits(tmp_vault_dir):
+    """Adding a project to a non-existent group should exit with an error."""
+    args = _make_args(tmp_vault_dir, group="nonexistent", project="beta")
+    with pytest.raises(SystemExit):
+        cmd_group_add_project(args)
+
+
 def test_cmd_group_remove_project_prints_confirmation(tmp_vault_dir, capsys):
     create_group(tmp_vault_dir, "team", ["alpha", "beta"])
     args = _make_args(tmp_vault_dir, group="team", project="alpha")
