@@ -48,7 +48,11 @@ def import_env(project: str, password: str, input_path: str) -> dict:
 
 
 def parse_env_file(path: str) -> dict:
-    """Parse a .env file into a dict, skipping comments and blank lines."""
+    """Parse a .env file into a dict, skipping comments and blank lines.
+
+    Handles quoted values (single or double quotes) and strips inline comments
+    for unquoted values.
+    """
     result = {}
     with open(path, encoding="utf-8") as f:
         for line in f:
@@ -63,6 +67,10 @@ def parse_env_file(path: str) -> dict:
             # Strip surrounding quotes
             if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
                 value = value[1:-1]
+            else:
+                # Strip inline comments for unquoted values (e.g. FOO=bar # comment)
+                if " #" in value:
+                    value = value[:value.index(" #")].strip()
             if key:
                 result[key] = value
     return result
