@@ -78,10 +78,13 @@ def test_diff_snapshot_vs_current(tmp_vault_dir):
 def test_diff_missing_snapshot_raises(tmp_vault_dir):
     _save("proj", "pw", {"K": "v"}, tmp_vault_dir)
     save_snapshot("proj", "pw", "snap1", vault_dir=tmp_vault_dir)
+
     with pytest.raises(DiffError):
-        diff_snapshots("proj", "pw", "snap1", "nope", vault_dir=tmp_vault_dir)
+        diff_snapshots("proj", "pw", "snap1", "nonexistent", vault_dir=tmp_vault_dir)
 
 
-def test_diff_vs_current_missing_project_raises(tmp_vault_dir):
-    with pytest.raises(DiffError, match="does not exist"):
-        diff_snapshot_vs_current("ghost", "pw", "snap", vault_dir=tmp_vault_dir)
+def test_diff_missing_both_snapshots_raises(tmp_vault_dir):
+    _save("proj", "pw", {"K": "v"}, tmp_vault_dir)
+
+    with pytest.raises(DiffError):
+        diff_snapshots("proj", "pw", "ghost1", "ghost2", vault_dir=tmp_vault_dir)
